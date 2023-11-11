@@ -1,51 +1,83 @@
-use rstar::{PointDistance, RTreeObject, AABB};
+use rstar::Point;
 
-struct Circle {
-    origin: [f32; 2],
-    radius: f32,
+#[derive(Clone, Copy, Debug, PartialEq)]
+struct Data {
+    coordinates: [i32; 18],
 }
 
-impl RTreeObject for Circle {
-    type Envelope = AABB<[f32; 2]>;
+impl Point for Data {
+    type Scalar = i32;
+    const DIMENSIONS: usize = 18;
 
-    fn envelope(&self) -> Self::Envelope {
-        let corner_1 = [self.origin[0] - self.radius, self.origin[1] - self.radius];
-        let corner_2 = [self.origin[0] + self.radius, self.origin[1] + self.radius];
-        AABB::from_corners(corner_1, corner_2)
-    }
-}
-
-impl PointDistance for Circle {
-    fn distance_2(&self, point: &[f32; 2]) -> f32 {
-        let d_x = self.origin[0] - point[0];
-        let d_y = self.origin[1] - point[1];
-        let distance_to_origin = (d_x * d_x + d_y * d_y).sqrt();
-        let distance_to_ring = distance_to_origin - self.radius;
-        let distance_to_circle = f32::max(0.0, distance_to_ring);
-        // We must return the squared distance!
-        distance_to_circle * distance_to_circle
+    fn nth(&self, index: usize) -> Self::Scalar {
+        self.coordinates[index]
     }
 
-    // This implementation is not required but more efficient since it
-    // omits the calculation of a square root
-    fn contains_point(&self, point: &[f32; 2]) -> bool {
-        let d_x = self.origin[0] - point[0];
-        let d_y = self.origin[1] - point[1];
-        let distance_to_origin_2 = d_x * d_x + d_y * d_y;
-        let radius_2 = self.radius * self.radius;
-        distance_to_origin_2 <= radius_2
+    fn nth_mut(&mut self, index: usize) -> &mut Self::Scalar {
+        &mut self.coordinates[index]
+    }
+
+    fn generate(mut generator: impl FnMut(usize) -> Self::Scalar) -> Self {
+        Data {
+            coordinates: [
+                generator(0),
+                generator(1),
+                generator(2),
+                generator(3),
+                generator(4),
+                generator(5),
+                generator(6),
+                generator(7),
+                generator(8),
+                generator(9),
+                generator(10),
+                generator(11),
+                generator(12),
+                generator(13),
+                generator(14),
+                generator(15),
+                generator(16),
+                generator(17),
+            ],
+        }
     }
 }
 
 fn main() {
-    println!("Starting...");
-    let circle = Circle {
-        origin: [1.0, 0.0],
-        radius: 1.0,
-    };
-
-    assert_eq!(circle.distance_2(&[-1.0, 0.0]), 1.0);
-    assert_eq!(circle.distance_2(&[-2.0, 0.0]), 4.0);
-    assert!(circle.contains_point(&[1.0, 0.0]));
-    println!("Done");
+    let mut tree = rstar::RTree::new();
+    tree.insert(Data {
+        coordinates: [
+            30, 30, 62, 30, 31, 30, 20, 12, 30, 80, 40, 132, 28, 78, 140, 139, 195, 67,
+        ],
+    });
+    tree.insert(Data {
+        coordinates: [
+            40, 9, 9, 144, 136, 149, 148, 140, 198, 36, 50, 167, 179, 234, 38, 2, 103, 38,
+        ],
+    });
+    tree.insert(Data {
+        coordinates: [
+            38, 38, 38, 6, 2, 3, 155, 61, 61, 195, 155, 15, 70, 134, 158, 126, 94, 63,
+        ],
+    });
+    tree.insert(Data {
+        coordinates: [
+            154, 154, 138, 179, 121, 75, 143, 31, 7, 67, 11, 3, 113, 113, 65, 65, 73, 65,
+        ],
+    });
+    tree.insert(Data {
+        coordinates: [
+            221, 215, 209, 115, 210, 198, 224, 236, 111, 6, 7, 7, 85, 92, 203, 197, 36, 44,
+        ],
+    });
+    tree.insert(Data {
+        coordinates: [
+            176, 240, 176, 176, 112, 241, 240, 240, 192, 44, 44, 12, 206, 204, 142, 4, 44, 2,
+        ],
+    });
+    tree.insert(Data {
+        coordinates: [
+            212, 218, 202, 70, 70, 23, 23, 23, 1, 230, 250, 55, 30, 23, 60, 60, 92, 16,
+        ],
+    });
 }

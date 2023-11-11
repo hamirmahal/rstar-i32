@@ -1,13 +1,12 @@
-This repository contains some boilerplate code.
-
-It should output
+`src/main.rs` should output
 
 ```
-   Compiling rstar-boilerplate v0.1.0 (/home/hamir/repositories/rstar-boilerplate)
-    Finished dev [unoptimized + debuginfo] target(s) in 0.18s
+$  cargo run
+    Finished dev [unoptimized + debuginfo] target(s) in 0.01s
      Running `target/debug/rstar-boilerplate`
-Starting...
-Done
+thread 'main' panicked at /rustc/cc66ad468955717ab92600c770da8c1601a4ff33/library/core/src/ops/arith.rs:346:1:
+attempt to multiply with overflow
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
 ```
 
-after cloning and running `cargo run`.
+after cloning this repository and running `cargo run`.
