@@ -1,0 +1,24 @@
+name: Run and comment on commit
+
+on: [push]
+
+jobs:
+  comment:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Run cargo
+        id: cargo
+        run: |
+          echo "This is the output of \`cargo run\`." > output.txt
+          echo "" >> output.txt
+          echo "\`\`\`" >> output.txt
+          cargo run >> output.txt
+          echo "\`\`\`" >> output.txt
+
+      - name: Create commit comment
+        uses: peter-evans/commit-comment@v3
+        with:
+          body-path: "output.txt"
